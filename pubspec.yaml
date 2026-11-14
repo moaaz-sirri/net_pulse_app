@@ -1,0 +1,11 @@
+name: net_pulse_app
+description: NetPulse network diagnostics.
+publish_to: 'none'
+version: 1.0.0+1
+environment:
+  sdk: ^3.13.3
+dependencies:
+  flutter:
+    sdk: flutter
+flutter:
+  uses-material-design: true
