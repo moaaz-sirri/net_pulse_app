@@ -53,6 +53,19 @@ class _NetPulseAppState extends State<NetPulseApp> {
       locale: widget.settings.locale,
       supportedLocales: DashboardStrings.languages.keys.map(Locale.new),
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      builder: (context, child) {
+        if (Localizations.localeOf(context).languageCode != 'ar') {
+          return child!;
+        }
+        final theme = Theme.of(context);
+        return Theme(
+          data: theme.copyWith(
+            textTheme: theme.textTheme.apply(fontFamily: 'Cairo'),
+            primaryTextTheme: theme.primaryTextTheme.apply(fontFamily: 'Cairo'),
+          ),
+          child: child!,
+        );
+      },
       home: DashboardView(model: _dashboard, settings: widget.settings),
     ),
   );
