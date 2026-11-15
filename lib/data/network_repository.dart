@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'dart:typed_data';
+import 'package:flutter/services.dart';
 
 enum NetworkTransport { wifi, mobile, other, none }
 
@@ -52,9 +52,17 @@ class CloudflareNetworkRepository implements NetworkRepository {
 
   @override
   Future<SpeedResult?> measureOn(NetworkTransport transport) async {
-    if (await _activeTransport() != transport) return null;
-    final result = await measureSpeed();
-    return await _activeTransport() == transport ? result : null;
+    const channel = MethodChannel('netpulse/network');
+    final values = await channel.invokeMapMethod<String, double>(
+      'measure',
+      transport.name,
+    );
+    if (values == null) return null;
+    return (
+      download: values['download']!,
+      upload: values['upload']!,
+      latencyMs: values['latencyMs']!,
+    );
   }
 
   @override
