@@ -62,7 +62,9 @@ class DashboardStrings {
       "See which network is active and whether it can reach the internet.",
       "Measure download and upload speeds on the connection your device is currently using.",
       "About this app",
-      "NetPulse checks internet access and measures connection speed. Use it to see whether your connection works or compare Wi-Fi and mobile data.",
+      "NetPulse helps you check whether your device can reach the internet and measure how your connection performs. Use Check connection to see which network is active and whether it has internet access.\n\n"
+          "Run a speed test to measure download and upload speeds on your current connection. For a fuller picture, choose Wi-Fi, mobile data, or both in the full internet test. NetPulse tests each selected network separately and shows download speed, upload speed, and latency.\n\n"
+          "Download and upload speeds tell you how quickly data moves to and from your device. Latency tells you how long a response takes. You can change the test provider in Settings.",
     ],
     "ar": [
       "معلومات",
@@ -70,7 +72,9 @@ class DashboardStrings {
       "اعرف الشبكة النشطة وتحقق من قدرتها على الوصول إلى الإنترنت.",
       "قِس سرعة التنزيل والرفع على الاتصال الذي يستخدمه جهازك حاليًا.",
       "عن التطبيق",
-      "يتحقق NetPulse من الوصول إلى الإنترنت ويقيس سرعة الاتصال. استخدمه للتأكد من أن اتصالك يعمل أو لمقارنة الواي فاي ببيانات الهاتف.",
+      "يساعدك NetPulse على التحقق من قدرة جهازك على الوصول إلى الإنترنت وقياس أداء الاتصال. استخدم «فحص الاتصال» لمعرفة الشبكة النشطة والتحقق من توفر الإنترنت عليها.\n\n"
+          "يقيس اختبار السرعة سرعتي التنزيل والرفع على اتصالك الحالي. وللحصول على تفاصيل أكثر، اختر الواي فاي أو بيانات الهاتف أو كليهما في اختبار الإنترنت الشامل. يختبر NetPulse كل شبكة تختارها على حدة ويعرض سرعة التنزيل وسرعة الرفع وزمن الاستجابة.\n\n"
+          "توضّح سرعتا التنزيل والرفع مدى سرعة انتقال البيانات من جهازك وإليه. ويبيّن زمن الاستجابة المدة اللازمة لتلقي رد. يمكنك تغيير مزود الاختبار من الإعدادات.",
     ],
     "zh": [
       "说明",
@@ -78,7 +82,9 @@ class DashboardStrings {
       "查看当前使用的网络，并检查是否能访问互联网。",
       "测量设备当前连接的下载和上传速度。",
       "关于此应用",
-      "NetPulse 可检查互联网连接并测量网速。你可以确认网络能否上网，或比较 Wi-Fi 和移动数据。",
+      "NetPulse 可以检查设备能否访问互联网，并测量网络连接的表现。使用连接检查功能，即可查看当前使用的网络及其是否能够上网。\n\n"
+          "运行网速测试可测量当前连接的下载和上传速度。如需了解更多，可在全面网络测试中选择 Wi-Fi、移动数据或两者。NetPulse 会分别测试所选网络，并显示下载速度、上传速度和延迟。\n\n"
+          "下载和上传速度表示设备接收和发送数据的快慢。延迟表示等待响应所需的时间。你可以在设置中更换测试服务提供商。",
     ],
     "hi": [
       "जानकारी",
@@ -86,7 +92,9 @@ class DashboardStrings {
       "देखें कि कौन-सा नेटवर्क सक्रिय है और क्या उससे इंटरनेट चल रहा है।",
       "डिवाइस के मौजूदा कनेक्शन की डाउनलोड और अपलोड स्पीड मापें।",
       "इस ऐप के बारे में",
-      "NetPulse इंटरनेट कनेक्शन की जाँच करता है और उसकी स्पीड मापता है। इससे आप देख सकते हैं कि इंटरनेट चल रहा है या वाई-फ़ाई और मोबाइल डेटा की तुलना कर सकते हैं।",
+      "NetPulse से आप जाँच सकते हैं कि आपका डिवाइस इंटरनेट तक पहुँच पा रहा है या नहीं और कनेक्शन कैसा काम कर रहा है। कनेक्शन की जाँच करके देखें कि कौन-सा नेटवर्क सक्रिय है और उस पर इंटरनेट चल रहा है या नहीं।\n\n"
+          "स्पीड टेस्ट से मौजूदा कनेक्शन की डाउनलोड और अपलोड स्पीड मापें। ज़्यादा जानकारी के लिए पूरे इंटरनेट टेस्ट में वाई-फ़ाई, मोबाइल डेटा या दोनों चुनें। NetPulse हर चुने गए नेटवर्क का अलग-अलग टेस्ट करता है और डाउनलोड स्पीड, अपलोड स्पीड और प्रतिक्रिया समय दिखाता है।\n\n"
+          "डाउनलोड और अपलोड स्पीड बताती है कि आपका डिवाइस कितनी तेज़ी से डेटा प्राप्त और भेज सकता है। प्रतिक्रिया समय बताता है कि जवाब मिलने में कितना समय लगता है। आप सेटिंग में टेस्ट प्रदाता बदल सकते हैं।",
     ],
     "es": [
       "Información",
@@ -94,7 +102,9 @@ class DashboardStrings {
       "Consulta qué red está activa y comprueba si puede acceder a internet.",
       "Mide las velocidades de descarga y subida de la conexión que usa tu dispositivo.",
       "Acerca de esta aplicación",
-      "NetPulse comprueba el acceso a internet y mide la velocidad de conexión. Úsalo para comprobar si tu conexión funciona o comparar el Wi-Fi con los datos móviles.",
+      "NetPulse te ayuda a comprobar si tu dispositivo puede acceder a internet y a medir el rendimiento de la conexión. Usa la comprobación de conexión para ver qué red está activa y si tiene acceso a internet.\n\n"
+          "Haz una prueba de velocidad para medir la descarga y la subida en tu conexión actual. Para obtener más información, elige Wi-Fi, datos móviles o ambos en la prueba completa de internet. NetPulse prueba cada red seleccionada por separado y muestra la velocidad de descarga, la velocidad de subida y la latencia.\n\n"
+          "Las velocidades de descarga y subida indican qué tan rápido recibe y envía datos tu dispositivo. La latencia indica cuánto tarda en llegar una respuesta. Puedes cambiar el proveedor de la prueba en Ajustes.",
     ],
     "fr": [
       "Informations",
@@ -102,7 +112,9 @@ class DashboardStrings {
       "Identifiez le réseau actif et vérifiez s’il peut accéder à Internet.",
       "Mesurez les débits descendant et montant de la connexion utilisée par votre appareil.",
       "À propos de cette application",
-      "NetPulse vérifie l’accès à Internet et mesure le débit de votre connexion. Utilisez-le pour vérifier si votre connexion fonctionne ou comparer le Wi-Fi et les données mobiles.",
+      "NetPulse vous aide à vérifier si votre appareil peut accéder à Internet et à mesurer les performances de votre connexion. Utilisez la vérification de la connexion pour savoir quel réseau est actif et s’il permet d’accéder à Internet.\n\n"
+          "Lancez un test de débit pour mesurer les débits descendant et montant de votre connexion actuelle. Pour en savoir plus, choisissez le Wi-Fi, les données mobiles ou les deux dans le test Internet complet. NetPulse teste chaque réseau sélectionné séparément et affiche les débits descendant et montant ainsi que la latence.\n\n"
+          "Les débits descendant et montant indiquent à quelle vitesse votre appareil reçoit et envoie des données. La latence correspond au délai de réponse. Vous pouvez changer de fournisseur de test dans les paramètres.",
     ],
     "pt": [
       "Informações",
@@ -110,7 +122,9 @@ class DashboardStrings {
       "Veja qual rede está ativa e verifique se ela tem acesso à internet.",
       "Meça as velocidades de download e upload da conexão que seu dispositivo está usando.",
       "Sobre este aplicativo",
-      "O NetPulse verifica o acesso à internet e mede a velocidade da conexão. Use-o para verificar se a conexão funciona ou comparar o Wi-Fi com os dados móveis.",
+      "O NetPulse ajuda a verificar se o dispositivo consegue acessar a internet e a medir o desempenho da conexão. Use a verificação de conexão para ver qual rede está ativa e se ela tem acesso à internet.\n\n"
+          "Execute um teste de velocidade para medir o download e o upload na conexão atual. Para obter mais informações, escolha Wi-Fi, dados móveis ou ambos no teste completo de internet. O NetPulse testa cada rede selecionada separadamente e mostra as velocidades de download e upload e a latência.\n\n"
+          "As velocidades de download e upload indicam a rapidez com que o dispositivo recebe e envia dados. A latência indica quanto tempo leva para receber uma resposta. Você pode mudar o provedor do teste nas configurações.",
     ],
   };
 
