@@ -1,6 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract interface class PreferencesRepository {
+  Future<String?> readProvider();
+  Future<void> saveProvider(String provider);
   Future<String?> readTheme();
   Future<String?> readLanguage();
   Future<void> saveTheme(String theme);
@@ -9,6 +11,13 @@ abstract interface class PreferencesRepository {
 
 class LocalPreferencesRepository implements PreferencesRepository {
   final SharedPreferencesAsync _preferences = SharedPreferencesAsync();
+
+  @override
+  Future<String?> readProvider() => _preferences.getString('testProvider');
+
+  @override
+  Future<void> saveProvider(String provider) =>
+      _preferences.setString('testProvider', provider);
 
   @override
   Future<String?> readTheme() => _preferences.getString('theme');

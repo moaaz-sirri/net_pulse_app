@@ -11,32 +11,46 @@ import UIKit
       binaryMessenger: engineBridge.applicationRegistrar.messenger()
     )
     channel.setMethodCallHandler { call, reply in
-      guard call.method == "measure", let transport = call.arguments as? String,
+      guard call.method == "measure", let args = call.arguments as? [String: Any],
+            let transport = args["transport"] as? String,
             transport == "wifi" || transport == "mobile" else {
         reply(FlutterMethodNotImplemented)
         return
       }
-      InterfaceSpeedTest(interface: transport == "wifi" ? .wifi : .cellular, reply: reply)
-        .start()
+      guard let ping = args["pingUrl"] as? String, let pingURL = URL(string: ping),
+            let download = args["downloadUrl"] as? String, let downloadURL = URL(string: download),
+            let downloadBytes = args["downloadBytes"] as? Int, downloadBytes > 0,
+            let upload = args["uploadUrl"] as? String, let uploadURL = URL(string: upload),
+            [pingURL, downloadURL, uploadURL].allSatisfy({
+              $0.scheme == "https" && $0.host != nil && $0.port == nil
+            }) else {
+        reply(FlutterError(code: "invalid_measurement", message: "Invalid HTTPS endpoint", details: nil))
+        return
+      }
+      InterfaceSpeedTest(
+        interface: transport == "wifi" ? .wifi : .cellular,
+        phases: [
+          .init(url: pingURL, bytes: 0, upload: false),
+          .init(url: downloadURL, bytes: downloadBytes, upload: false),
+          .init(url: uploadURL, bytes: 3_000_000, upload: true)
+        ],
+        reply: reply
+      ).start()
     }
   }
 }
 
 private final class InterfaceSpeedTest {
-  private struct Transfer {
+  struct Transfer {
+    let url: URL
     let bytes: Int
     let upload: Bool
   }
 
-  private let host = "speed.cloudflare.com"
   private let interface: NWInterface.InterfaceType
   private let reply: FlutterResult
   private let queue = DispatchQueue(label: "netpulse.network")
-  private let phases = [
-    Transfer(bytes: 0, upload: false),
-    Transfer(bytes: 8_000_000, upload: false),
-    Transfer(bytes: 3_000_000, upload: true)
-  ]
+  private let phases: [Transfer]
   private var times: [Double] = []
   private var connection: NWConnection?
   private var timeout: DispatchWorkItem?
@@ -45,7 +59,8 @@ private final class InterfaceSpeedTest {
   private var parsedHeader = false
   private var startTime: UInt64 = 0
 
-  init(interface: NWInterface.InterfaceType, reply: @escaping FlutterResult) {
+  init(interface: NWInterface.InterfaceType, phases: [Transfer], reply: @escaping FlutterResult) {
+    self.phases = phases
     self.interface = interface
     self.reply = reply
   }
@@ -57,6 +72,10 @@ private final class InterfaceSpeedTest {
   private func connect() {
     let parameters = NWParameters(tls: NWProtocolTLS.Options(), tcp: NWProtocolTCP.Options())
     parameters.requiredInterfaceType = interface
+    guard let host = phases[times.count].url.host else {
+      finish(failure())
+      return
+    }
     let connection = NWConnection(host: NWEndpoint.Host(host), port: .https, using: parameters)
     self.connection = connection
     header = Data()
@@ -93,8 +112,12 @@ private final class InterfaceSpeedTest {
     queue.asyncAfter(deadline: .now() + 20, execute: transferTimeout)
 
     let transfer = phases[times.count]
-    let nonce = DispatchTime.now().uptimeNanoseconds
-    let path = transfer.upload ? "/__up?nonce=\(nonce)" : "/__down?bytes=\(transfer.bytes)&nonce=\(nonce)"
+    guard let url = URLComponents(url: transfer.url, resolvingAgainstBaseURL: false),
+          let host = url.host else {
+      finish(failure())
+      return
+    }
+    let path = url.percentEncodedPath + (url.percentEncodedQuery.map { "?" + $0 } ?? "")
     let method = transfer.upload ? "POST" : "GET"
     var request = "\(method) \(path) HTTP/1.0\r\nHost: \(host)\r\nConnection: close\r\nAccept-Encoding: identity\r\nCache-Control: no-cache\r\n"
     if transfer.upload {

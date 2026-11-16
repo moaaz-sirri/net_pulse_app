@@ -15,8 +15,38 @@ abstract interface class NetworkRepository {
   Future<SpeedResult?> measureOn(NetworkTransport transport);
 }
 
-class CloudflareNetworkRepository implements NetworkRepository {
-  static const _host = 'speed.cloudflare.com';
+enum TestProvider {
+  cloudflare('Cloudflare', 'speed.cloudflare.com'),
+  clouvider('Clouvider', 'ams.speedtest.clouvider.net', prefix: '/backend'),
+  cesnet('CESNET', 'speedtest.cesnet.cz', prefix: '/backend');
+
+  const TestProvider(this.label, this.host, {this.prefix = ''});
+
+  final String label;
+  final String host;
+  final String prefix;
+
+  int get downloadBytes => this == cloudflare ? 8000000 : 8 * 1024 * 1024;
+
+  Uri downloadUrl(int bytes) => this == cloudflare
+      ? _url('/__down', {'bytes': '$bytes'})
+      : bytes == 0
+      ? _url('$prefix/empty.php')
+      : _url('$prefix/garbage.php', {'ckSize': '8'});
+
+  Uri get uploadUrl => _url(this == cloudflare ? '/__up' : '$prefix/empty.php');
+
+  Uri _url(String path, [Map<String, String> query = const {}]) => Uri.https(
+    host,
+    path,
+    {...query, 'nonce': '${DateTime.now().microsecondsSinceEpoch}'},
+  );
+}
+
+class HttpNetworkRepository implements NetworkRepository {
+  HttpNetworkRepository(this.provider);
+
+  final TestProvider provider;
 
   Future<NetworkTransport> _activeTransport() async {
     final interfaces = await Connectivity().checkConnectivity();
@@ -53,10 +83,13 @@ class CloudflareNetworkRepository implements NetworkRepository {
   @override
   Future<SpeedResult?> measureOn(NetworkTransport transport) async {
     const channel = MethodChannel('netpulse/network');
-    final values = await channel.invokeMapMethod<String, double>(
-      'measure',
-      transport.name,
-    );
+    final values = await channel.invokeMapMethod<String, double>('measure', {
+      'transport': transport.name,
+      'pingUrl': provider.downloadUrl(0).toString(),
+      'downloadUrl': provider.downloadUrl(provider.downloadBytes).toString(),
+      'downloadBytes': provider.downloadBytes,
+      'uploadUrl': provider.uploadUrl.toString(),
+    });
     if (values == null) return null;
     return (
       download: values['download']!,
@@ -71,9 +104,9 @@ class CloudflareNetworkRepository implements NetworkRepository {
     final latency = Stopwatch()..start();
     await _download(client, 0);
     latency.stop();
-    final download = await _download(client, 8000000);
+    final download = await _download(client, provider.downloadBytes);
     final payload = Uint8List(3000000);
-    final request = await client.postUrl(Uri.https(_host, '/__up'));
+    final request = await client.postUrl(provider.uploadUrl);
     request.followRedirects = false;
     request.headers.contentType = ContentType.binary;
     request.contentLength = payload.length;
@@ -102,12 +135,7 @@ class CloudflareNetworkRepository implements NetworkRepository {
   }
 
   Future<double> _download(HttpClient client, int bytes) async {
-    final request = await client.getUrl(
-      Uri.https(_host, '/__down', {
-        'bytes': '$bytes',
-        'nonce': '${DateTime.now().microsecondsSinceEpoch}',
-      }),
-    );
+    final request = await client.getUrl(provider.downloadUrl(bytes));
     request.followRedirects = false;
     request.headers.set(HttpHeaders.cacheControlHeader, 'no-cache');
     final timer = Stopwatch()..start();

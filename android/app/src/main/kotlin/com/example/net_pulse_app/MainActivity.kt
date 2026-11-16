@@ -20,7 +20,7 @@ class MainActivity : FlutterActivity() {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "netpulse/network")
             .setMethodCallHandler { call, result ->
-                val transport = when (call.arguments) {
+                val transport = when (call.argument<String>("transport")) {
                     "wifi" -> NetworkCapabilities.TRANSPORT_WIFI
                     "mobile" -> NetworkCapabilities.TRANSPORT_CELLULAR
                     else -> null
@@ -28,12 +28,27 @@ class MainActivity : FlutterActivity() {
                 if (call.method != "measure" || transport == null) {
                     result.notImplemented()
                 } else {
-                    measureOn(transport, result)
+                    val pingUrl = call.argument<String>("pingUrl")
+                    val downloadUrl = call.argument<String>("downloadUrl")
+                    val downloadBytes = call.argument<Int>("downloadBytes")
+                    val uploadUrl = call.argument<String>("uploadUrl")
+                    if (pingUrl == null || downloadUrl == null || downloadBytes == null || uploadUrl == null) {
+                        result.error("invalid_measurement", "Missing measurement endpoint", null)
+                    } else {
+                        measureOn(transport, pingUrl, downloadUrl, downloadBytes, uploadUrl, result)
+                    }
                 }
             }
     }
 
-    private fun measureOn(transport: Int, result: MethodChannel.Result) {
+    private fun measureOn(
+        transport: Int,
+        pingUrl: String,
+        downloadUrl: String,
+        downloadBytes: Int,
+        uploadUrl: String,
+        result: MethodChannel.Result
+    ) {
         val manager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val started = AtomicBoolean(false)
         val request = NetworkRequest.Builder()
@@ -46,12 +61,12 @@ class MainActivity : FlutterActivity() {
                 if (!started.compareAndSet(false, true)) return
                 Thread {
                     try {
-                        val latency = transfer(network, 0, false)
-                        val download = transfer(network, 8_000_000, false)
-                        val upload = transfer(network, 3_000_000, true)
+                        val latency = transfer(network, pingUrl, 0, false)
+                        val download = transfer(network, downloadUrl, downloadBytes, false)
+                        val upload = transfer(network, uploadUrl, 3_000_000, true)
                         runOnUiThread {
                             result.success(mapOf(
-                                "download" to 8_000_000 * 8.0 / download,
+                                "download" to downloadBytes * 8.0 / download,
                                 "upload" to 3_000_000 * 8.0 / upload,
                                 "latencyMs" to latency / 1000.0
                             ))
@@ -87,10 +102,9 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun transfer(network: Network, bytes: Int, upload: Boolean): Double {
-        val path = if (upload) "/__up" else "/__down?bytes=$bytes"
-        val separator = if (upload) "?" else "&"
-        val url = URL("https://speed.cloudflare.com$path${separator}nonce=${System.nanoTime()}")
+    private fun transfer(network: Network, endpoint: String, bytes: Int, upload: Boolean): Double {
+        val url = URL(endpoint)
+        check(url.protocol == "https") { "Measurement requires HTTPS" }
         val connection = network.openConnection(url, Proxy.NO_PROXY) as HttpURLConnection
         try {
             connection.connectTimeout = 8000

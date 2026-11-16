@@ -26,6 +26,14 @@ class _Network implements NetworkRepository {
 }
 
 class _Preferences implements PreferencesRepository {
+  String? provider;
+
+  @override
+  Future<String?> readProvider() async => provider;
+
+  @override
+  Future<void> saveProvider(String value) async => provider = value;
+
   @override
   Future<String?> readTheme() async => null;
 
@@ -40,6 +48,34 @@ class _Preferences implements PreferencesRepository {
 }
 
 void main() {
+  testWidgets('selects a test provider and restores the saved choice', (
+    tester,
+  ) async {
+    final preferences = _Preferences();
+    final settings = SettingsViewModel(preferences);
+    await settings.load();
+    expect(settings.provider, TestProvider.cloudflare);
+
+    await tester.pumpWidget(
+      NetPulseApp(repository: _Network(), settings: settings),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.settings_outlined));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Test provider'));
+    await tester.pumpAndSettle();
+    expect(find.text('Cloudflare'), findsOneWidget);
+    expect(find.text('Clouvider'), findsOneWidget);
+    await tester.tap(find.text('CESNET'));
+    await tester.pumpAndSettle();
+
+    final restored = SettingsViewModel(preferences);
+    await restored.load();
+    expect(settings.provider, TestProvider.cesnet);
+    expect(restored.provider, TestProvider.cesnet);
+    restored.dispose();
+  });
+
   testWidgets('full report measures only the selected networks', (
     tester,
   ) async {

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../data/network_repository.dart';
 import '../data/preferences_repository.dart';
 
 class SettingsViewModel extends ChangeNotifier {
@@ -12,6 +13,8 @@ class SettingsViewModel extends ChangeNotifier {
   ThemeMode get theme => _theme;
   Locale? _locale;
   Locale? get locale => _locale;
+  TestProvider _provider = TestProvider.cloudflare;
+  TestProvider get provider => _provider;
   Future<void> _pendingWrite = Future.value();
 
   Future<void> load() async {
@@ -19,6 +22,7 @@ class SettingsViewModel extends ChangeNotifier {
       final values = await Future.wait([
         _repository.readTheme(),
         _repository.readLanguage(),
+        _repository.readProvider(),
       ]);
       _theme = ThemeMode.values.firstWhere(
         (mode) => mode.name == values[0],
@@ -26,9 +30,19 @@ class SettingsViewModel extends ChangeNotifier {
       );
       final language = values[1];
       _locale = language == null ? null : Locale(language);
+      _provider = TestProvider.values.firstWhere(
+        (provider) => provider.name == values[2],
+        orElse: () => TestProvider.cloudflare,
+      );
     } on Exception catch (error) {
       debugPrint('Could not restore preferences: $error');
     }
+  }
+
+  void setProvider(TestProvider provider) {
+    if (_provider == provider) return;
+    _provider = provider;
+    _save(() => _repository.saveProvider(provider.name));
   }
 
   void setTheme(ThemeMode theme) {

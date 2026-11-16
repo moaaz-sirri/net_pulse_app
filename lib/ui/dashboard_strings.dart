@@ -24,6 +24,7 @@ enum Copy {
   light,
   dark,
   speedHint,
+  provider,
 }
 
 enum ReportCopy { title, start, usage, latency, unavailable, choose, both }
@@ -203,7 +204,8 @@ class DashboardStrings {
       'System default',
       'Light',
       'Dark',
-      'Uses the active connection and transfers about 11 MB with Cloudflare.',
+      'Uses the active connection and transfers about 11 MB.',
+      'Test provider',
     ],
     'zh': [
       '网络诊断',
@@ -228,7 +230,8 @@ class DashboardStrings {
       '跟随系统',
       '浅色',
       '深色',
-      '通过当前连接与 Cloudflare 传输约 11 MB 数据。',
+      '通过当前连接传输约 11 MB 数据。',
+      '测速服务商',
     ],
     'hi': [
       'इंटरनेट जाँच',
@@ -253,7 +256,8 @@ class DashboardStrings {
       'सिस्टम की सेटिंग',
       'लाइट',
       'डार्क',
-      'मौजूदा कनेक्शन पर Cloudflare के साथ लगभग 11 MB डेटा का आदान-प्रदान होता है।',
+      'मौजूदा कनेक्शन पर लगभग 11 MB डेटा का आदान-प्रदान होता है।',
+      'परीक्षण प्रदाता',
     ],
     'es': [
       'Diagnóstico de Internet',
@@ -278,7 +282,8 @@ class DashboardStrings {
       'Según el sistema',
       'Claro',
       'Oscuro',
-      'Usa la conexión activa y transfiere unos 11 MB con Cloudflare.',
+      'Usa la conexión activa y transfiere unos 11 MB.',
+      'Proveedor de pruebas',
     ],
     'ar': [
       'تشخيص الإنترنت',
@@ -303,7 +308,8 @@ class DashboardStrings {
       'حسب النظام',
       'فاتح',
       'داكن',
-      'يستخدم الاتصال النشط وينقل حوالي ١١ ميغابايت مع Cloudflare.',
+      'يستخدم الاتصال النشط وينقل حوالي ١١ ميغابايت.',
+      'مزوّد الاختبار',
     ],
     'fr': [
       'Diagnostic Internet',
@@ -328,7 +334,8 @@ class DashboardStrings {
       'Selon le système',
       'Clair',
       'Sombre',
-      'Utilise la connexion active et transfère environ 11 Mo avec Cloudflare.',
+      'Utilise la connexion active et transfère environ 11 Mo.',
+      'Fournisseur de test',
     ],
     'pt': [
       'Diagnóstico de internet',
@@ -353,7 +360,8 @@ class DashboardStrings {
       'Padrão do sistema',
       'Claro',
       'Escuro',
-      'Usa a conexão ativa e transfere cerca de 11 MB com a Cloudflare.',
+      'Usa a conexão ativa e transfere cerca de 11 MB.',
+      'Provedor de teste',
     ],
   };
 }

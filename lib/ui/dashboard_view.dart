@@ -356,6 +356,11 @@ class _SettingsView extends StatelessWidget {
               ),
               (strings[Copy.language], Icons.language, _LanguageView(model)),
               (
+                strings[Copy.provider],
+                Icons.dns_outlined,
+                _ProviderView(model),
+              ),
+              (
                 strings.help(HelpCopy.aboutTitle),
                 Icons.info_outline,
                 const _AboutView(),
@@ -374,6 +379,34 @@ class _SettingsView extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ProviderView extends StatelessWidget {
+  const _ProviderView(this.model);
+
+  final SettingsViewModel model;
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: Text(DashboardStrings(context)[Copy.provider])),
+    body: SafeArea(
+      child: ListenableBuilder(
+        listenable: model,
+        builder: (context, _) => RadioGroup<TestProvider>(
+          groupValue: model.provider,
+          onChanged: (value) {
+            if (value != null) model.setProvider(value);
+          },
+          child: ListView(
+            children: [
+              for (final provider in TestProvider.values)
+                RadioListTile(value: provider, title: Text(provider.label)),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 class _AppearanceView extends StatelessWidget {

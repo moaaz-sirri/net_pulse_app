@@ -5,9 +5,12 @@ import '../data/network_repository.dart';
 enum Diagnostic { connection, speed, full }
 
 class DashboardViewModel extends ChangeNotifier {
-  DashboardViewModel(this._repository);
+  DashboardViewModel(NetworkRepository repository)
+    : this.withRepositoryFactory(() => repository);
 
-  final NetworkRepository _repository;
+  DashboardViewModel.withRepositoryFactory(this._createRepository);
+
+  final NetworkRepository Function() _createRepository;
 
   Diagnostic? _running;
   Diagnostic? get running => _running;
@@ -38,6 +41,7 @@ class DashboardViewModel extends ChangeNotifier {
 
   Future<void> startReport(List<NetworkTransport> networks) async {
     if (_running != null || _disposed) return;
+    final repository = _createRepository();
     _report.clear();
     _reportFailures.clear();
     _selectedNetworks = List.of(networks);
@@ -47,7 +51,7 @@ class DashboardViewModel extends ChangeNotifier {
       final target = _selectedNetworks[_step];
       notifyListeners();
       try {
-        _report[target] = await _repository.measureOn(target);
+        _report[target] = await repository.measureOn(target);
       } on Exception {
         _reportFailures.add(target);
         _report[target] = null;
@@ -63,6 +67,7 @@ class DashboardViewModel extends ChangeNotifier {
   Future<void> run(Diagnostic diagnostic) async {
     if (_running != null || _disposed) return;
     if (diagnostic == Diagnostic.full) return startReport(reportNetworks);
+    final repository = _createRepository();
     _running = diagnostic;
     _failed = null;
     switch (diagnostic) {
@@ -77,9 +82,9 @@ class DashboardViewModel extends ChangeNotifier {
     try {
       switch (diagnostic) {
         case Diagnostic.connection:
-          _connection = await _repository.checkConnection();
+          _connection = await repository.checkConnection();
         case Diagnostic.speed:
-          _speed = await _repository.measureSpeed();
+          _speed = await repository.measureSpeed();
         case Diagnostic.full:
           break;
       }

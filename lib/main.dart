@@ -13,19 +13,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final settings = SettingsViewModel(LocalPreferencesRepository());
   await settings.load();
-  runApp(
-    NetPulseApp(repository: CloudflareNetworkRepository(), settings: settings),
-  );
+  runApp(NetPulseApp(settings: settings));
 }
 
 class NetPulseApp extends StatefulWidget {
-  const NetPulseApp({
-    super.key,
-    required this.repository,
-    required this.settings,
-  });
+  const NetPulseApp({super.key, this.repository, required this.settings});
 
-  final NetworkRepository repository;
+  final NetworkRepository? repository;
   final SettingsViewModel settings;
 
   @override
@@ -33,7 +27,9 @@ class NetPulseApp extends StatefulWidget {
 }
 
 class _NetPulseAppState extends State<NetPulseApp> {
-  late final _dashboard = DashboardViewModel(widget.repository);
+  late final _dashboard = DashboardViewModel.withRepositoryFactory(
+    () => widget.repository ?? HttpNetworkRepository(widget.settings.provider),
+  );
 
   @override
   void dispose() {
