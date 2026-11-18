@@ -2,7 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:net_pulse_app/data/network_repository.dart';
 import 'package:net_pulse_app/ui/dashboard_view_model.dart';
 
-const SpeedResult result = (download: 40, upload: 8, latencyMs: 32);
+const SpeedResult result = (
+  download: 40,
+  upload: 8,
+  latencyMs: 32,
+  downloadLatencyMs: 40.0,
+  uploadLatencyMs: 55.0,
+);
 
 class _Network implements NetworkRepository {
   bool failSpeed = true;

@@ -11,47 +11,37 @@ import UIKit
       binaryMessenger: engineBridge.applicationRegistrar.messenger()
     )
     channel.setMethodCallHandler { call, reply in
-      guard call.method == "measure", let args = call.arguments as? [String: Any],
+      guard call.method == "transfer", let args = call.arguments as? [String: Any],
             let transport = args["transport"] as? String,
             transport == "wifi" || transport == "mobile" else {
         reply(FlutterMethodNotImplemented)
         return
       }
-      guard let ping = args["pingUrl"] as? String, let pingURL = URL(string: ping),
-            let download = args["downloadUrl"] as? String, let downloadURL = URL(string: download),
-            let downloadBytes = args["downloadBytes"] as? Int, downloadBytes > 0,
-            let upload = args["uploadUrl"] as? String, let uploadURL = URL(string: upload),
-            [pingURL, downloadURL, uploadURL].allSatisfy({
-              $0.scheme == "https" && $0.host != nil && $0.port == nil
-            }) else {
-        reply(FlutterError(code: "invalid_measurement", message: "Invalid HTTPS endpoint", details: nil))
+      guard let endpoint = args["url"] as? String, let url = URL(string: endpoint),
+            let bytes = args["bytes"] as? Int, (0...10_000_000).contains(bytes),
+            let upload = args["upload"] as? Bool,
+            url.scheme == "https", url.host != nil, url.port == nil else {
+        reply(FlutterError(code: "invalid_measurement", message: "Invalid HTTPS transfer", details: nil))
         return
       }
-      InterfaceSpeedTest(
+      InterfaceTransfer(
         interface: transport == "wifi" ? .wifi : .cellular,
-        phases: [
-          .init(url: pingURL, bytes: 0, upload: false),
-          .init(url: downloadURL, bytes: downloadBytes, upload: false),
-          .init(url: uploadURL, bytes: 3_000_000, upload: true)
-        ],
+        url: url,
+        bytes: bytes,
+        upload: upload,
         reply: reply
       ).start()
     }
   }
 }
 
-private final class InterfaceSpeedTest {
-  struct Transfer {
-    let url: URL
-    let bytes: Int
-    let upload: Bool
-  }
-
+private final class InterfaceTransfer {
   private let interface: NWInterface.InterfaceType
   private let reply: FlutterResult
   private let queue = DispatchQueue(label: "netpulse.network")
-  private let phases: [Transfer]
-  private var times: [Double] = []
+  private let url: URL
+  private let bytes: Int
+  private let upload: Bool
   private var connection: NWConnection?
   private var timeout: DispatchWorkItem?
   private var header = Data()
@@ -59,8 +49,11 @@ private final class InterfaceSpeedTest {
   private var parsedHeader = false
   private var startTime: UInt64 = 0
 
-  init(interface: NWInterface.InterfaceType, phases: [Transfer], reply: @escaping FlutterResult) {
-    self.phases = phases
+  init(interface: NWInterface.InterfaceType, url: URL, bytes: Int, upload: Bool,
+       reply: @escaping FlutterResult) {
+    self.url = url
+    self.bytes = bytes
+    self.upload = upload
     self.interface = interface
     self.reply = reply
   }
@@ -72,7 +65,7 @@ private final class InterfaceSpeedTest {
   private func connect() {
     let parameters = NWParameters(tls: NWProtocolTLS.Options(), tcp: NWProtocolTCP.Options())
     parameters.requiredInterfaceType = interface
-    guard let host = phases[times.count].url.host else {
+    guard let host = url.host else {
       finish(failure())
       return
     }
@@ -84,7 +77,7 @@ private final class InterfaceSpeedTest {
     startTime = 0
     let availabilityTimeout = DispatchWorkItem { [weak self] in
       guard let self else { return }
-      self.finish(self.times.isEmpty ? nil : self.failure())
+      self.finish(nil)
     }
     timeout = availabilityTimeout
     queue.asyncAfter(deadline: .now() + 8, execute: availabilityTimeout)
@@ -111,20 +104,19 @@ private final class InterfaceSpeedTest {
     timeout = transferTimeout
     queue.asyncAfter(deadline: .now() + 20, execute: transferTimeout)
 
-    let transfer = phases[times.count]
-    guard let url = URLComponents(url: transfer.url, resolvingAgainstBaseURL: false),
+    guard let url = URLComponents(url: self.url, resolvingAgainstBaseURL: false),
           let host = url.host else {
       finish(failure())
       return
     }
     let path = url.percentEncodedPath + (url.percentEncodedQuery.map { "?" + $0 } ?? "")
-    let method = transfer.upload ? "POST" : "GET"
+    let method = upload ? "POST" : "GET"
     var request = "\(method) \(path) HTTP/1.0\r\nHost: \(host)\r\nConnection: close\r\nAccept-Encoding: identity\r\nCache-Control: no-cache\r\n"
-    if transfer.upload {
-      request += "Content-Type: application/octet-stream\r\nContent-Length: \(transfer.bytes)\r\n"
+    if upload {
+      request += "Content-Type: application/octet-stream\r\nContent-Length: \(bytes)\r\n"
     }
     var data = Data((request + "\r\n").utf8)
-    if transfer.upload { data.append(Data(count: transfer.bytes)) }
+    if upload { data.append(Data(count: bytes)) }
     startTime = DispatchTime.now().uptimeNanoseconds
     connection.send(content: data, completion: .contentProcessed { [weak self, weak connection] error in
       guard let self, let connection, connection === self.connection else { return }
@@ -137,7 +129,6 @@ private final class InterfaceSpeedTest {
     connection.receive(minimumIncompleteLength: 1, maximumLength: 64 * 1024) {
       [weak self, weak connection] data, _, complete, error in
       guard let self, let connection, connection === self.connection else { return }
-      let transfer = self.phases[self.times.count]
       if let data {
         if self.parsedHeader {
           self.received += data.count
@@ -147,12 +138,16 @@ private final class InterfaceSpeedTest {
           if let end = self.header.range(of: separator) {
             let lines = String(decoding: self.header[..<end.lowerBound], as: UTF8.self)
               .components(separatedBy: "\r\n")
-            guard lines.first?.split(separator: " ").dropFirst().first == "200",
-                  !lines.dropFirst().contains(where: {
+            guard let statusField = lines.first?.split(separator: " ").dropFirst().first,
+                  let status = Int(statusField), (200...299).contains(status),
+                  (self.upload || self.bytes == 0 || !lines.dropFirst().contains(where: {
                     $0.lowercased().hasPrefix("transfer-encoding:")
-                  }) else {
+                  })) else {
               self.finish(self.failure())
               return
+            }
+            if !self.upload && self.bytes > 0 {
+              self.startTime = DispatchTime.now().uptimeNanoseconds
             }
             self.parsedHeader = true
             self.received = self.header.count - end.upperBound
@@ -163,9 +158,9 @@ private final class InterfaceSpeedTest {
           }
         }
       }
-      if self.parsedHeader && (transfer.upload || self.received == transfer.bytes) {
+      if self.parsedHeader && (self.upload || self.bytes == 0 || self.received == self.bytes) {
         self.completeTransfer()
-      } else if error != nil || complete || self.received > transfer.bytes {
+      } else if error != nil || complete || self.received > self.bytes {
         self.finish(self.failure())
       } else {
         self.receive(on: connection)
@@ -174,18 +169,10 @@ private final class InterfaceSpeedTest {
   }
 
   private func completeTransfer() {
-    let elapsed = DispatchTime.now().uptimeNanoseconds - startTime
-    times.append(max(Double(elapsed) / 1000, 1))
-    closeConnection()
-    if times.count < phases.count {
-      connect()
-    } else {
-      finish([
-        "download": Double(phases[1].bytes) * 8 / times[1],
-        "upload": Double(phases[2].bytes) * 8 / times[2],
-        "latencyMs": times[0] / 1000
-      ])
-    }
+    finish([
+      "start": Int64(startTime / 1000),
+      "end": Int64(DispatchTime.now().uptimeNanoseconds / 1000)
+    ])
   }
 
   private func failure() -> FlutterError {

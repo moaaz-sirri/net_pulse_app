@@ -25,17 +25,16 @@ class MainActivity : FlutterActivity() {
                     "mobile" -> NetworkCapabilities.TRANSPORT_CELLULAR
                     else -> null
                 }
-                if (call.method != "measure" || transport == null) {
+                if (call.method != "transfer" || transport == null) {
                     result.notImplemented()
                 } else {
-                    val pingUrl = call.argument<String>("pingUrl")
-                    val downloadUrl = call.argument<String>("downloadUrl")
-                    val downloadBytes = call.argument<Int>("downloadBytes")
-                    val uploadUrl = call.argument<String>("uploadUrl")
-                    if (pingUrl == null || downloadUrl == null || downloadBytes == null || uploadUrl == null) {
-                        result.error("invalid_measurement", "Missing measurement endpoint", null)
+                    val url = call.argument<String>("url")
+                    val bytes = call.argument<Int>("bytes")
+                    val upload = call.argument<Boolean>("upload")
+                    if (url == null || bytes == null || bytes !in 0..10_000_000 || upload == null) {
+                        result.error("invalid_measurement", "Invalid transfer parameters", null)
                     } else {
-                        measureOn(transport, pingUrl, downloadUrl, downloadBytes, uploadUrl, result)
+                        measureOn(transport, url, bytes, upload, result)
                     }
                 }
             }
@@ -43,10 +42,9 @@ class MainActivity : FlutterActivity() {
 
     private fun measureOn(
         transport: Int,
-        pingUrl: String,
-        downloadUrl: String,
-        downloadBytes: Int,
-        uploadUrl: String,
+        url: String,
+        bytes: Int,
+        upload: Boolean,
         result: MethodChannel.Result
     ) {
         val manager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -61,16 +59,8 @@ class MainActivity : FlutterActivity() {
                 if (!started.compareAndSet(false, true)) return
                 Thread {
                     try {
-                        val latency = transfer(network, pingUrl, 0, false)
-                        val download = transfer(network, downloadUrl, downloadBytes, false)
-                        val upload = transfer(network, uploadUrl, 3_000_000, true)
-                        runOnUiThread {
-                            result.success(mapOf(
-                                "download" to downloadBytes * 8.0 / download,
-                                "upload" to 3_000_000 * 8.0 / upload,
-                                "latencyMs" to latency / 1000.0
-                            ))
-                        }
+                        val timing = transfer(network, url, bytes, upload)
+                        runOnUiThread { result.success(timing) }
                     } catch (error: Exception) {
                         runOnUiThread { result.error("measurement_failed", error.message, null) }
                     } finally {
@@ -102,7 +92,7 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun transfer(network: Network, endpoint: String, bytes: Int, upload: Boolean): Double {
+    private fun transfer(network: Network, endpoint: String, bytes: Int, upload: Boolean): Map<String, Long> {
         val url = URL(endpoint)
         check(url.protocol == "https") { "Measurement requires HTTPS" }
         val connection = network.openConnection(url, Proxy.NO_PROXY) as HttpURLConnection
@@ -118,9 +108,14 @@ class MainActivity : FlutterActivity() {
                 connection.setFixedLengthStreamingMode(bytes)
                 connection.setRequestProperty("Content-Type", "application/octet-stream")
             }
-            val start = SystemClock.elapsedRealtimeNanos()
+            var start = SystemClock.elapsedRealtimeNanos()
             if (upload) connection.outputStream.use { it.write(ByteArray(bytes)) }
-            check(connection.responseCode == 200) { "Unexpected HTTP status ${connection.responseCode}" }
+            val status = connection.responseCode
+            check(status in 200..299) { "Unexpected HTTP status $status" }
+            if (upload || bytes == 0) {
+                return mapOf("start" to start / 1000, "end" to SystemClock.elapsedRealtimeNanos() / 1000)
+            }
+            start = SystemClock.elapsedRealtimeNanos()
             val buffer = ByteArray(32 * 1024)
             var received = 0
             connection.inputStream.use { input ->
@@ -131,8 +126,8 @@ class MainActivity : FlutterActivity() {
                     check(SystemClock.elapsedRealtimeNanos() - start < 20_000_000_000L)
                 }
             }
-            check(upload || received == bytes) { "Incomplete download" }
-            return ((SystemClock.elapsedRealtimeNanos() - start) / 1000.0).coerceAtLeast(1.0)
+            check(received == bytes) { "Incomplete download" }
+            return mapOf("start" to start / 1000, "end" to SystemClock.elapsedRealtimeNanos() / 1000)
         } finally {
             connection.disconnect()
         }
