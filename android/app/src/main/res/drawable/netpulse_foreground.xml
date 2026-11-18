@@ -1,7 +1,13 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="320" android:viewportHeight="320">
-    <path android:pathData="M94,162 L126,162 L145,125 L171,195 L191,146 L203,162 L226,162"
-        android:strokeColor="#F7F5F2" android:strokeWidth="13"
-        android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <group android:pivotX="160" android:pivotY="160"
+        android:scaleX="0.75" android:scaleY="0.75">
+        <path android:pathData="M61,107 Q160,17 259,107 M101,141 Q160,90 219,141"
+            android:strokeColor="#F7F5F2" android:strokeWidth="24"
+            android:strokeLineCap="round" />
+        <path android:pathData="M42,208 L99,208 L114,189 L136,223 L163,150 L186,244 L208,192 L224,208 L278,208"
+            android:strokeColor="#F7F5F2" android:strokeWidth="17"
+            android:strokeLineCap="round" android:strokeLineJoin="round" />
+    </group>
 </vector>
