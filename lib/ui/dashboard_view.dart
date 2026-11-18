@@ -40,7 +40,6 @@ class DashboardView extends StatelessWidget {
                 listenable: model,
                 builder: (context, _) {
                   final status = model.connection;
-                  final speed = model.speed;
                   final format = NumberFormat.decimalPatternDigits(
                     locale: Localizations.localeOf(context).toLanguageTag(),
                     decimalDigits: 1,
@@ -79,39 +78,6 @@ class DashboardView extends StatelessWidget {
                               ? () => model.run(Diagnostic.connection)
                               : null,
                           child: Text(strings[Copy.check]),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _Panel(
-                        title: strings[Copy.speed],
-                        info: strings.help(HelpCopy.speed),
-                        icon: Icons.speed_outlined,
-                        content: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (speed != null) ...[
-                              Text(
-                                '${strings[Copy.download]}  ${format.format(speed.download)} Mbps',
-                              ),
-                              Text(
-                                '${strings[Copy.upload]}  ${format.format(speed.upload)} Mbps',
-                              ),
-                              const SizedBox(height: 8),
-                            ],
-                            Text(
-                              strings[Copy.speedHint],
-                              style: TextStyle(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                        feedback: _Feedback(model, Diagnostic.speed),
-                        action: OutlinedButton(
-                          onPressed: model.running == null
-                              ? () => model.run(Diagnostic.speed)
-                              : null,
-                          child: Text(strings[Copy.measure]),
                         ),
                       ),
                     ],
@@ -163,17 +129,36 @@ class _FullTestPanel extends StatelessWidget {
                 style: theme.textTheme.titleMedium,
               ),
               if (model.resultFor(network) case final result?) ...[
-                Text(
-                  '${format.format(result.download)} Mbps',
-                  style: theme.textTheme.headlineSmall,
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 24,
+                  runSpacing: 8,
+                  children: [
+                    for (final (label, value) in [
+                      (Copy.download, result.download),
+                      (Copy.upload, result.upload),
+                    ])
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(strings[label]),
+                          Text(
+                            '${format.format(value)} Mbps',
+                            style: theme.textTheme.headlineSmall,
+                          ),
+                        ],
+                      ),
+                  ],
                 ),
-                Text(strings[Copy.download]),
-                Text(
-                  '${strings[Copy.upload]}  ${format.format(result.upload)} Mbps',
-                ),
-                Text(
-                  '${strings.report(ReportCopy.latency)}  ${format.format(result.latencyMs)} ms',
-                ),
+                const SizedBox(height: 8),
+                for (final (label, value) in [
+                  (ReportCopy.latency, result.latencyMs),
+                  (ReportCopy.duringDownload, result.downloadLatencyMs),
+                  (ReportCopy.duringUpload, result.uploadLatencyMs),
+                ])
+                  Text(
+                    '${strings.report(label)}  ${value == null ? '—' : '${format.format(value)} ms'}',
+                  ),
               ] else
                 Text(
                   model.failedFor(network)

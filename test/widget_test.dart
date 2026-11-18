@@ -16,13 +16,30 @@ class _Network implements NetworkRepository {
   Future<SpeedResult?> measureOn(NetworkTransport transport) async {
     requested.add(transport);
     return transport == NetworkTransport.wifi
-        ? (download: 100.0, upload: 20.0, latencyMs: 15.0)
-        : (download: 40.0, upload: 8.0, latencyMs: 32.0);
+        ? (
+            download: 100.0,
+            upload: 20.0,
+            latencyMs: 15.0,
+            downloadLatencyMs: 40.0,
+            uploadLatencyMs: 55.0,
+          )
+        : (
+            download: 40.0,
+            upload: 8.0,
+            latencyMs: 32.0,
+            downloadLatencyMs: 40.0,
+            uploadLatencyMs: 55.0,
+          );
   }
 
   @override
-  Future<SpeedResult> measureSpeed() async =>
-      (download: 87.5, upload: 12.0, latencyMs: 25.0);
+  Future<SpeedResult> measureSpeed() async => (
+    download: 87.5,
+    upload: 12.0,
+    latencyMs: 25.0,
+    downloadLatencyMs: 40.0,
+    uploadLatencyMs: 55.0,
+  );
 }
 
 class _Preferences implements PreferencesRepository {
@@ -104,6 +121,8 @@ void main() {
       NetworkTransport.mobile,
     ]);
     expect(find.text('100.0 Mbps'), findsOneWidget);
+    expect(find.text('During download  40.0 ms'), findsWidgets);
+    expect(find.text('During upload  55.0 ms'), findsWidgets);
     expect(find.text('40.0 Mbps'), findsOneWidget);
   });
   testWidgets(
@@ -120,12 +139,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.textContaining('Test server unreachable'), findsOneWidget);
 
-      await tester.ensureVisible(find.text('Run speed test'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Run speed test'));
-      await tester.pumpAndSettle();
-      expect(find.textContaining('87.5 Mbps'), findsOneWidget);
-      expect(find.textContaining('12.0 Mbps'), findsOneWidget);
+      expect(find.text('Speed test'), findsNothing);
+      expect(find.text('Run speed test'), findsNothing);
 
       settings.setLocale(const Locale('ar'));
       settings.setTheme(ThemeMode.dark);

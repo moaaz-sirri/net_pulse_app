@@ -27,7 +27,17 @@ enum Copy {
   provider,
 }
 
-enum ReportCopy { title, start, usage, latency, unavailable, choose, both }
+enum ReportCopy {
+  title,
+  start,
+  usage,
+  latency,
+  unavailable,
+  choose,
+  both,
+  duringDownload,
+  duringUpload,
+}
 
 enum HelpCopy { info, full, connection, speed, aboutTitle, about }
 
@@ -63,7 +73,7 @@ class DashboardStrings {
       "Measure download and upload speeds on the connection your device is currently using.",
       "About this app",
       "NetPulse helps you check whether your device can reach the internet and measure how your connection performs. Use Check connection to see which network is active and whether it has internet access.\n\n"
-          "Run a speed test to measure download and upload speeds on your current connection. For a fuller picture, choose Wi-Fi, mobile data, or both in the full internet test. NetPulse tests each selected network separately and shows download speed, upload speed, and latency.\n\n"
+          "Choose Wi-Fi, mobile data, or both in the full internet test. NetPulse tests each selected network separately and shows download speed, upload speed, and latency.\n\n"
           "Download and upload speeds tell you how quickly data moves to and from your device. Latency tells you how long a response takes. You can change the test provider in Settings.",
     ],
     "ar": [
@@ -73,7 +83,7 @@ class DashboardStrings {
       "قِس سرعة التنزيل والرفع على الاتصال الذي يستخدمه جهازك حاليًا.",
       "عن التطبيق",
       "يساعدك NetPulse على التحقق من قدرة جهازك على الوصول إلى الإنترنت وقياس أداء الاتصال. استخدم «فحص الاتصال» لمعرفة الشبكة النشطة والتحقق من توفر الإنترنت عليها.\n\n"
-          "يقيس اختبار السرعة سرعتي التنزيل والرفع على اتصالك الحالي. وللحصول على تفاصيل أكثر، اختر الواي فاي أو بيانات الهاتف أو كليهما في اختبار الإنترنت الشامل. يختبر NetPulse كل شبكة تختارها على حدة ويعرض سرعة التنزيل وسرعة الرفع وزمن الاستجابة.\n\n"
+          "اختر الواي فاي أو بيانات الهاتف أو كليهما في اختبار الإنترنت الشامل. يختبر NetPulse كل شبكة تختارها على حدة ويعرض سرعة التنزيل وسرعة الرفع وزمن الاستجابة.\n\n"
           "توضّح سرعتا التنزيل والرفع مدى سرعة انتقال البيانات من جهازك وإليه. ويبيّن زمن الاستجابة المدة اللازمة لتلقي رد. يمكنك تغيير مزود الاختبار من الإعدادات.",
     ],
     "zh": [
@@ -83,7 +93,7 @@ class DashboardStrings {
       "测量设备当前连接的下载和上传速度。",
       "关于此应用",
       "NetPulse 可以检查设备能否访问互联网，并测量网络连接的表现。使用连接检查功能，即可查看当前使用的网络及其是否能够上网。\n\n"
-          "运行网速测试可测量当前连接的下载和上传速度。如需了解更多，可在全面网络测试中选择 Wi-Fi、移动数据或两者。NetPulse 会分别测试所选网络，并显示下载速度、上传速度和延迟。\n\n"
+          "在全面网络测试中选择 Wi-Fi、移动数据或两者。NetPulse 会分别测试所选网络，并显示下载速度、上传速度和延迟。\n\n"
           "下载和上传速度表示设备接收和发送数据的快慢。延迟表示等待响应所需的时间。你可以在设置中更换测试服务提供商。",
     ],
     "hi": [
@@ -93,7 +103,7 @@ class DashboardStrings {
       "डिवाइस के मौजूदा कनेक्शन की डाउनलोड और अपलोड स्पीड मापें।",
       "इस ऐप के बारे में",
       "NetPulse से आप जाँच सकते हैं कि आपका डिवाइस इंटरनेट तक पहुँच पा रहा है या नहीं और कनेक्शन कैसा काम कर रहा है। कनेक्शन की जाँच करके देखें कि कौन-सा नेटवर्क सक्रिय है और उस पर इंटरनेट चल रहा है या नहीं।\n\n"
-          "स्पीड टेस्ट से मौजूदा कनेक्शन की डाउनलोड और अपलोड स्पीड मापें। ज़्यादा जानकारी के लिए पूरे इंटरनेट टेस्ट में वाई-फ़ाई, मोबाइल डेटा या दोनों चुनें। NetPulse हर चुने गए नेटवर्क का अलग-अलग टेस्ट करता है और डाउनलोड स्पीड, अपलोड स्पीड और प्रतिक्रिया समय दिखाता है।\n\n"
+          "पूरे इंटरनेट टेस्ट में वाई-फ़ाई, मोबाइल डेटा या दोनों चुनें। NetPulse हर चुने गए नेटवर्क का अलग-अलग टेस्ट करता है और डाउनलोड स्पीड, अपलोड स्पीड और प्रतिक्रिया समय दिखाता है।\n\n"
           "डाउनलोड और अपलोड स्पीड बताती है कि आपका डिवाइस कितनी तेज़ी से डेटा प्राप्त और भेज सकता है। प्रतिक्रिया समय बताता है कि जवाब मिलने में कितना समय लगता है। आप सेटिंग में टेस्ट प्रदाता बदल सकते हैं।",
     ],
     "es": [
@@ -103,7 +113,7 @@ class DashboardStrings {
       "Mide las velocidades de descarga y subida de la conexión que usa tu dispositivo.",
       "Acerca de esta aplicación",
       "NetPulse te ayuda a comprobar si tu dispositivo puede acceder a internet y a medir el rendimiento de la conexión. Usa la comprobación de conexión para ver qué red está activa y si tiene acceso a internet.\n\n"
-          "Haz una prueba de velocidad para medir la descarga y la subida en tu conexión actual. Para obtener más información, elige Wi-Fi, datos móviles o ambos en la prueba completa de internet. NetPulse prueba cada red seleccionada por separado y muestra la velocidad de descarga, la velocidad de subida y la latencia.\n\n"
+          "Para obtener más información, elige Wi-Fi, datos móviles o ambos en la prueba completa de internet. NetPulse prueba cada red seleccionada por separado y muestra la velocidad de descarga, la velocidad de subida y la latencia.\n\n"
           "Las velocidades de descarga y subida indican qué tan rápido recibe y envía datos tu dispositivo. La latencia indica cuánto tarda en llegar una respuesta. Puedes cambiar el proveedor de la prueba en Ajustes.",
     ],
     "fr": [
@@ -113,7 +123,7 @@ class DashboardStrings {
       "Mesurez les débits descendant et montant de la connexion utilisée par votre appareil.",
       "À propos de cette application",
       "NetPulse vous aide à vérifier si votre appareil peut accéder à Internet et à mesurer les performances de votre connexion. Utilisez la vérification de la connexion pour savoir quel réseau est actif et s’il permet d’accéder à Internet.\n\n"
-          "Lancez un test de débit pour mesurer les débits descendant et montant de votre connexion actuelle. Pour en savoir plus, choisissez le Wi-Fi, les données mobiles ou les deux dans le test Internet complet. NetPulse teste chaque réseau sélectionné séparément et affiche les débits descendant et montant ainsi que la latence.\n\n"
+          "Pour en savoir plus, choisissez le Wi-Fi, les données mobiles ou les deux dans le test Internet complet. NetPulse teste chaque réseau sélectionné séparément et affiche les débits descendant et montant ainsi que la latence.\n\n"
           "Les débits descendant et montant indiquent à quelle vitesse votre appareil reçoit et envoie des données. La latence correspond au délai de réponse. Vous pouvez changer de fournisseur de test dans les paramètres.",
     ],
     "pt": [
@@ -123,7 +133,7 @@ class DashboardStrings {
       "Meça as velocidades de download e upload da conexão que seu dispositivo está usando.",
       "Sobre este aplicativo",
       "O NetPulse ajuda a verificar se o dispositivo consegue acessar a internet e a medir o desempenho da conexão. Use a verificação de conexão para ver qual rede está ativa e se ela tem acesso à internet.\n\n"
-          "Execute um teste de velocidade para medir o download e o upload na conexão atual. Para obter mais informações, escolha Wi-Fi, dados móveis ou ambos no teste completo de internet. O NetPulse testa cada rede selecionada separadamente e mostra as velocidades de download e upload e a latência.\n\n"
+          "Para obter mais informações, escolha Wi-Fi, dados móveis ou ambos no teste completo de internet. O NetPulse testa cada rede selecionada separadamente e mostra as velocidades de download e upload e a latência.\n\n"
           "As velocidades de download e upload indicam a rapidez com que o dispositivo recebe e envia dados. A latência indica quanto tempo leva para receber uma resposta. Você pode mudar o provedor do teste nas configurações.",
     ],
   };
@@ -132,65 +142,79 @@ class DashboardStrings {
     'en': [
       'Full internet test',
       'Choose networks',
-      'Uses about 11 MB per network.',
+      'Uses up to 46 MB per network.',
       'Latency',
       'Network unavailable',
       'Which connection should we test?',
       'Wi-Fi and mobile data',
+      'During download',
+      'During upload',
     ],
     'ar': [
       'اختبار الإنترنت الشامل',
       'اختيار الشبكات',
-      'يستهلك حوالي ١١ ميغابايت لكل شبكة.',
+      'يستهلك حتى ٤٦ ميغابايت لكل شبكة.',
       'زمن الاستجابة',
       'الشبكة غير متاحة',
       'أي اتصال تريد اختباره؟',
       'الواي فاي وبيانات الهاتف',
+      'أثناء التنزيل',
+      'أثناء الرفع',
     ],
     'zh': [
       '全面网络测试',
       '选择网络',
-      '每个网络约消耗 11 MB 流量。',
+      '每个网络最多消耗 46 MB 流量。',
       '延迟',
       '网络不可用',
       '要测试哪个网络？',
       'Wi-Fi 和移动数据',
+      '下载时',
+      '上传时',
     ],
     'hi': [
       'पूरा इंटरनेट टेस्ट',
       'नेटवर्क चुनें',
-      'हर नेटवर्क पर लगभग 11 MB खर्च होंगे।',
+      'हर नेटवर्क पर अधिकतम 46 MB खर्च होंगे।',
       'प्रतिक्रिया समय',
       'नेटवर्क उपलब्ध नहीं है',
       'कौन-सा कनेक्शन जाँचना है?',
       'वाई-फ़ाई और मोबाइल डेटा',
+      'डाउनलोड के दौरान',
+      'अपलोड के दौरान',
     ],
     'es': [
       'Prueba completa de internet',
       'Elegir redes',
-      'Usa unos 11 MB por red.',
+      'Usa hasta 46 MB por red.',
       'Latencia',
       'Red no disponible',
       '¿Qué conexión quieres probar?',
       'Wi-Fi y datos móviles',
+      'Durante la descarga',
+      'Durante la subida',
     ],
     'fr': [
       'Test Internet complet',
       'Choisir les réseaux',
-      'Utilise environ 11 Mo par réseau.',
+      'Utilise jusqu’à 46 Mo par réseau.',
       'Latence',
       'Réseau indisponible',
       'Quelle connexion souhaitez-vous tester ?',
       'Wi-Fi et données mobiles',
+      'Pendant le téléchargement',
+      'Pendant l’envoi',
     ],
     'pt': [
       'Teste completo de internet',
       'Escolher redes',
-      'Usa cerca de 11 MB por rede.',
+      'Usa até 46 MB por rede.',
       'Latência',
       'Rede indisponível',
       'Qual conexão você quer testar?',
       'Wi-Fi e dados móveis',
+      'Durante o download',
+      'Durante o upload',
     ],
   };
 
@@ -218,7 +242,7 @@ class DashboardStrings {
       'System default',
       'Light',
       'Dark',
-      'Uses the active connection and transfers about 11 MB.',
+      'Uses the active connection and transfers up to 46 MB.',
       'Test provider',
     ],
     'zh': [
@@ -244,7 +268,7 @@ class DashboardStrings {
       '跟随系统',
       '浅色',
       '深色',
-      '通过当前连接传输约 11 MB 数据。',
+      '通过当前连接最多传输 46 MB 数据。',
       '测速服务商',
     ],
     'hi': [
@@ -270,7 +294,7 @@ class DashboardStrings {
       'सिस्टम की सेटिंग',
       'लाइट',
       'डार्क',
-      'मौजूदा कनेक्शन पर लगभग 11 MB डेटा का आदान-प्रदान होता है।',
+      'मौजूदा कनेक्शन पर अधिकतम 46 MB डेटा का आदान-प्रदान होता है।',
       'परीक्षण प्रदाता',
     ],
     'es': [
@@ -296,7 +320,7 @@ class DashboardStrings {
       'Según el sistema',
       'Claro',
       'Oscuro',
-      'Usa la conexión activa y transfiere unos 11 MB.',
+      'Usa la conexión activa y transfiere hasta 46 MB.',
       'Proveedor de pruebas',
     ],
     'ar': [
@@ -322,7 +346,7 @@ class DashboardStrings {
       'حسب النظام',
       'فاتح',
       'داكن',
-      'يستخدم الاتصال النشط وينقل حوالي ١١ ميغابايت.',
+      'يستخدم الاتصال النشط وينقل حتى ٤٦ ميغابايت.',
       'مزوّد الاختبار',
     ],
     'fr': [
@@ -348,7 +372,7 @@ class DashboardStrings {
       'Selon le système',
       'Clair',
       'Sombre',
-      'Utilise la connexion active et transfère environ 11 Mo.',
+      'Utilise la connexion active et transfère jusqu’à 46 Mo.',
       'Fournisseur de test',
     ],
     'pt': [
@@ -374,7 +398,7 @@ class DashboardStrings {
       'Padrão do sistema',
       'Claro',
       'Escuro',
-      'Usa a conexão ativa e transfere cerca de 11 MB.',
+      'Usa a conexão ativa e transfere até 46 MB.',
       'Provedor de teste',
     ],
   };

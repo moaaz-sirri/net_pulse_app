@@ -7,10 +7,9 @@ NetPulse is a Flutter app for Android and iOS that checks internet access, measu
 | Test | What it does |
 | --- | --- |
 | Connection | Identifies the active connection type and checks whether it can reach the test server. |
-| Speed test | Measures download and upload speeds on the connection the device is currently using. |
 | Full internet test | Tests Wi-Fi, mobile data, or both. Reports download speed, upload speed, and latency separately for each selected network. |
 
-The full test uses native Android and iOS networking APIs to send measurements over the selected interface. If you select both networks, it tests Wi-Fi first, then mobile data. Measurements use Cloudflare's speed test endpoints and transfer about 11 MB per tested network.
+The full test uses native Android and iOS networking APIs to send measurements over the selected interface. If you select both networks, it tests Wi-Fi first, then mobile data. Measurements use the selected test provider and transfer up to about 46 MB per network. The app uses a pilot transfer to size three parallel transfers where the provider supports variable payloads. For fixed-size downloads, it uses parallel transfers when the pilot completes quickly. Download timing starts after the response headers, and latency is the median of three probes after a warm-up request.
 
 NetPulse supports light, dark, and system appearance settings. The interface is available in English, Arabic, Simplified Chinese, French, Hindi, Portuguese, and Spanish. Arabic uses the bundled Cairo typeface and a right-to-left layout. Appearance and language preferences are stored on the device.
 
